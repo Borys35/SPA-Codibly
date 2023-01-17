@@ -1,79 +1,29 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import {
+  Box,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import Error from "./components/Error";
 import Loading from "./components/Loading";
-import { getProducts, PAGE_SIZE, ResponseType } from "./lib/api";
-
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 90 },
-  {
-    field: "name",
-    headerName: "Name",
-    width: 150,
-  },
-  {
-    field: "year",
-    headerName: "Year",
-    width: 150,
-  },
-];
-
-const rows = [
-  {
-    id: 1,
-    name: "cerulean",
-    year: 2000,
-    color: "#98B2D1",
-    pantone_value: "15-4020",
-  },
-  {
-    id: 2,
-    name: "fuchsia rose",
-    year: 2001,
-    color: "#C74375",
-    pantone_value: "17-2031",
-  },
-  {
-    id: 3,
-    name: "true red",
-    year: 2002,
-    color: "#BF1932",
-    pantone_value: "19-1664",
-  },
-  {
-    id: 4,
-    name: "aqua sky",
-    year: 2003,
-    color: "#7BC4C4",
-    pantone_value: "14-4811",
-  },
-  {
-    id: 5,
-    name: "tigerlily",
-    year: 2004,
-    color: "#E2583E",
-    pantone_value: "17-1456",
-  },
-  {
-    id: 6,
-    name: "blue turquoise",
-    year: 2005,
-    color: "#53B0AE",
-    pantone_value: "15-5217",
-  },
-];
+import { getProducts, ResponseType } from "./lib/api";
 
 function App() {
   const [page, setPage] = useState(1);
-  const { data, error, isLoading, refetch } = useQuery<ResponseType>(
-    ["products", page],
-    async () => await getProducts(page),
-    { keepPreviousData: true }
-  );
-
-  console.log(data);
+  const { data, error, isLoading, refetch, isFetchedAfterMount } =
+    useQuery<ResponseType>(
+      ["products", page],
+      async () => await getProducts(page),
+      { keepPreviousData: true }
+    );
 
   return (
     <div className="App">
@@ -92,7 +42,35 @@ function App() {
                 <TextField inputProps={{ inputMode: "decimal" }} size="small" />
                 <Button variant="contained">Find</Button>
               </Box>
-              <DataGrid
+              <TableContainer>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>ID</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell align="right">Year</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.data.map((row) => (
+                      <TableRow
+                        key={row.name}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                          backgroundColor: row.color,
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {row.id}
+                        </TableCell>
+                        <TableCell>{row.name}</TableCell>
+                        <TableCell align="right">{row.year}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              {/* <DataGrid
                 columns={columns}
                 rows={data.data}
                 pageSize={PAGE_SIZE}
@@ -100,9 +78,14 @@ function App() {
                 rowCount={data.total}
                 onPageChange={(newPage) => setPage(newPage + 1)}
                 page={page - 1}
-                onCellClick={() => {}}
+                onRowClick={() => {}}
                 paginationMode="server"
-              />
+                onStateChange={() => {
+                  // console.log(
+                  //   document.querySelectorAll<HTMLDivElement>("[data-rowindex]")
+                  // );
+                }}
+              /> */}
             </Box>
           ) : (
             <Error />

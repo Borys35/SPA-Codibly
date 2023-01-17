@@ -1,63 +1,101 @@
-import { Box, Button, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { Box, TextField, Typography } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useQuery } from "react-query";
+import Error from "./components/Error";
+import Loading from "./components/Loading";
+import { getProducts } from "./lib/api";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 90 },
   {
-    field: "firstName",
-    headerName: "First name",
+    field: "name",
+    headerName: "Name",
     width: 150,
-    editable: true,
   },
   {
-    field: "lastName",
-    headerName: "Last name",
+    field: "year",
+    headerName: "Year",
     width: 150,
-    editable: true,
-  },
-  {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    width: 110,
-    editable: true,
-  },
-  {
-    field: "fullName",
-    headerName: "Full name",
-    description: "This column has a value getter and is not sortable.",
-    sortable: false,
-    width: 160,
-    valueGetter: (params: GridValueGetterParams) =>
-      `${params.row.firstName || ""} ${params.row.lastName || ""}`,
   },
 ];
 
 const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
+  {
+    id: 1,
+    name: "cerulean",
+    year: 2000,
+    color: "#98B2D1",
+    pantone_value: "15-4020",
+  },
+  {
+    id: 2,
+    name: "fuchsia rose",
+    year: 2001,
+    color: "#C74375",
+    pantone_value: "17-2031",
+  },
+  {
+    id: 3,
+    name: "true red",
+    year: 2002,
+    color: "#BF1932",
+    pantone_value: "19-1664",
+  },
+  {
+    id: 4,
+    name: "aqua sky",
+    year: 2003,
+    color: "#7BC4C4",
+    pantone_value: "14-4811",
+  },
+  {
+    id: 5,
+    name: "tigerlily",
+    year: 2004,
+    color: "#E2583E",
+    pantone_value: "17-1456",
+  },
+  {
+    id: 6,
+    name: "blue turquoise",
+    year: 2005,
+    color: "#53B0AE",
+    pantone_value: "15-5217",
+  },
 ];
 
 function App() {
+  const { data, error, isLoading, refetch } = useQuery("products", getProducts);
+
+  console.log(data, error, refetch);
+
   return (
     <div className="App">
-      <Typography variant="h1">Codibly SPA</Typography>
-      <Button variant="contained">Start</Button>
-      <Box sx={{ height: 400, width: "100%" }}>
-        <DataGrid
-          columns={columns}
-          rows={rows}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          editMode="cell"
-        />
+      <Box
+        alignItems="center"
+        flexDirection="column"
+        display="flex"
+        gap={2}
+        p={2}
+      >
+        <Typography variant="h1">Codibly SPA</Typography>
+        {!isLoading ? (
+          !error ? (
+            <Box sx={{ height: 400, width: "100%" }}>
+              <TextField inputProps={{ inputMode: "decimal" }} />
+              <DataGrid
+                columns={columns}
+                rows={rows}
+                pageSize={5}
+                rowsPerPageOptions={[5]}
+              />
+            </Box>
+          ) : (
+            <Error />
+          )
+        ) : (
+          <Loading />
+        )}
       </Box>
     </div>
   );

@@ -1,9 +1,10 @@
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useState } from "react";
 import { useQuery } from "react-query";
 import Error from "./components/Error";
 import Loading from "./components/Loading";
-import { getProducts } from "./lib/api";
+import { getProducts, PAGE_SIZE, ResponseType } from "./lib/api";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 90 },
@@ -65,9 +66,14 @@ const rows = [
 ];
 
 function App() {
-  const { data, error, isLoading, refetch } = useQuery("products", getProducts);
+  const [page, setPage] = useState(1);
+  const { data, error, isLoading, refetch } = useQuery<ResponseType>(
+    ["products", page],
+    async () => await getProducts(page),
+    { keepPreviousData: true }
+  );
 
-  console.log(data, error, refetch);
+  console.log(data);
 
   return (
     <div className="App">
@@ -75,19 +81,27 @@ function App() {
         alignItems="center"
         flexDirection="column"
         display="flex"
-        gap={2}
+        gap={4}
         p={2}
       >
         <Typography variant="h1">Codibly SPA</Typography>
         {!isLoading ? (
-          !error ? (
+          !error && data ? (
             <Box sx={{ height: 400, width: "100%" }}>
-              <TextField inputProps={{ inputMode: "decimal" }} />
+              <Box display="flex">
+                <TextField inputProps={{ inputMode: "decimal" }} size="small" />
+                <Button variant="contained">Find</Button>
+              </Box>
               <DataGrid
                 columns={columns}
-                rows={rows}
-                pageSize={5}
-                rowsPerPageOptions={[5]}
+                rows={data.data}
+                pageSize={PAGE_SIZE}
+                rowsPerPageOptions={[PAGE_SIZE]}
+                rowCount={data.total}
+                onPageChange={(newPage) => setPage(newPage + 1)}
+                page={page - 1}
+                onCellClick={() => {}}
+                paginationMode="server"
               />
             </Box>
           ) : (

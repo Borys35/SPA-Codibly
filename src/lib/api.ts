@@ -16,10 +16,24 @@ export interface ResponseType {
   data: ProductType[];
 }
 
+export interface SingleResponseType {
+  data: ProductType;
+}
+
 export async function getProducts(page = 1) {
   const res = await fetch(
     `https://reqres.in/api/products?per_page=${PAGE_SIZE}&page=${page}`
   );
   const data = await res.json();
   return data as ResponseType;
+}
+
+export async function getProductById(id: number) {
+  try {
+    const res = await fetch(`https://reqres.in/api/products?id=${id}`);
+    const data = await res.json();
+    return data as SingleResponseType;
+  } catch (e) {
+    throw e;
+  }
 }

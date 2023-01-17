@@ -17,15 +17,23 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import Error from "./components/Error";
 import Loading from "./components/Loading";
+import ProductDialog from "./components/ProductDialog";
 import { getProducts, PAGE_SIZE, ResponseType } from "./lib/api";
 
 function App() {
   const [page, setPage] = useState(1);
+  const [selectedProductIndex, setSelectedProductIndex] = useState<
+    number | null
+  >(null);
   const { data, error, isLoading, refetch } = useQuery<ResponseType>(
     ["products", page],
     async () => await getProducts(page),
     { keepPreviousData: true }
   );
+
+  function handleDialogClose() {
+    setSelectedProductIndex(null);
+  }
 
   return (
     <div className="App">
@@ -45,7 +53,7 @@ function App() {
                 <Button variant="contained">Find</Button>
               </Box>
               <TableContainer>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <Table sx={{ minWidth: 650 }} aria-label="Main table">
                   <TableHead>
                     <TableRow>
                       <TableCell>ID</TableCell>
@@ -54,12 +62,15 @@ function App() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {data.data.map((row) => (
+                    {data.data.map((row, i) => (
                       <TableRow
                         key={row.name}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
                           backgroundColor: row.color,
+                        }}
+                        onClick={() => {
+                          setSelectedProductIndex(i);
                         }}
                       >
                         <TableCell component="th" scope="row">
@@ -85,6 +96,13 @@ function App() {
                   </TableFooter>
                 </Table>
               </TableContainer>
+              {selectedProductIndex !== null && (
+                <ProductDialog
+                  open={selectedProductIndex !== null}
+                  onClose={handleDialogClose}
+                  product={data.data[selectedProductIndex]}
+                />
+              )}
             </Box>
           ) : (
             <Error error={error} onRefetchClick={() => refetch()} />

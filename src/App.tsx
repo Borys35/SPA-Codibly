@@ -21,12 +21,11 @@ import { getProducts, PAGE_SIZE, ResponseType } from "./lib/api";
 
 function App() {
   const [page, setPage] = useState(1);
-  const { data, error, isLoading, refetch, isFetchedAfterMount } =
-    useQuery<ResponseType>(
-      ["products", page],
-      async () => await getProducts(page),
-      { keepPreviousData: true }
-    );
+  const { data, error, isLoading, refetch } = useQuery<ResponseType>(
+    ["products", page],
+    async () => await getProducts(page),
+    { keepPreviousData: true }
+  );
 
   return (
     <div className="App">
@@ -88,7 +87,7 @@ function App() {
               </TableContainer>
             </Box>
           ) : (
-            <Error />
+            <Error error={error} onRefetchClick={() => refetch()} />
           )
         ) : (
           <Loading />

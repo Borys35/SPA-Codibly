@@ -5,16 +5,19 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Typography,
 } from "@mui/material";
+import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import Error from "./components/Error";
 import Loading from "./components/Loading";
-import { getProducts, ResponseType } from "./lib/api";
+import { getProducts, PAGE_SIZE, ResponseType } from "./lib/api";
 
 function App() {
   const [page, setPage] = useState(1);
@@ -68,24 +71,21 @@ function App() {
                       </TableRow>
                     ))}
                   </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TablePagination
+                        rowsPerPageOptions={[5]}
+                        colSpan={3}
+                        count={data.total}
+                        rowsPerPage={PAGE_SIZE}
+                        page={page - 1}
+                        onPageChange={(e, newPage) => setPage(newPage + 1)}
+                        ActionsComponent={TablePaginationActions}
+                      />
+                    </TableRow>
+                  </TableFooter>
                 </Table>
               </TableContainer>
-              {/* <DataGrid
-                columns={columns}
-                rows={data.data}
-                pageSize={PAGE_SIZE}
-                rowsPerPageOptions={[PAGE_SIZE]}
-                rowCount={data.total}
-                onPageChange={(newPage) => setPage(newPage + 1)}
-                page={page - 1}
-                onRowClick={() => {}}
-                paginationMode="server"
-                onStateChange={() => {
-                  // console.log(
-                  //   document.querySelectorAll<HTMLDivElement>("[data-rowindex]")
-                  // );
-                }}
-              /> */}
             </Box>
           ) : (
             <Error />

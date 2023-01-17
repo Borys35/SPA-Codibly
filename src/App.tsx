@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -81,6 +82,15 @@ function App() {
           !error && data ? (
             <Box sx={{ height: 400, width: "100%" }}>
               <FilterForm onSubmit={handleFilterSubmit} />
+              {!Array.isArray(data.data) && (
+                <Button
+                  onClick={async () => await refetch()}
+                  color="warning"
+                  variant="outlined"
+                >
+                  Clear
+                </Button>
+              )}
               <TableContainer>
                 <Table sx={{ minWidth: 650 }} aria-label="Main table">
                   <TableHead>
@@ -136,7 +146,7 @@ function App() {
                         colSpan={3}
                         count={"total" in data ? data.total : 1}
                         rowsPerPage={PAGE_SIZE}
-                        page={page - 1}
+                        page={"total" in data ? page - 1 : 0}
                         onPageChange={(e, newPage) => setPage(newPage + 1)}
                         ActionsComponent={TablePaginationActions}
                       />

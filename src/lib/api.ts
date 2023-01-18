@@ -15,7 +15,6 @@ export async function getProducts(page = 1) {
 
 export async function getProductById(id: number) {
   const res = await fetch(`https://reqres.in/api/products?id=${id}`);
-  console.log("ok", res.ok);
   if (!res.ok) throw new Error(res.statusText);
   const data = await res.json();
   return data as SingleResponseType;

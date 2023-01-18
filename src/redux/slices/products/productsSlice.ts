@@ -76,7 +76,6 @@ export const fetchGetProductById = createAsyncThunk(
       thunkAPI.dispatch(setFilterId(id));
       return response;
     } catch (e) {
-      console.error("WHOOOT", e);
       thunkAPI.dispatch(setError(JSON.stringify(e)));
     }
   }

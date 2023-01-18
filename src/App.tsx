@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
 import { useEffect } from "react";
+import Error from "./components/Error";
 import FilterForm from "./components/FilterForm";
 import Loading from "./components/Loading";
 import ProductDialog from "./components/ProductDialog";
@@ -45,7 +46,9 @@ function App() {
       ? parseInt(searchParams.get("selected")!)
       : undefined;
 
-    id ? dispatch(fetchGetProductById(id)) : dispatch(fetchGetProducts(p));
+    id !== undefined
+      ? dispatch(fetchGetProductById(id))
+      : dispatch(fetchGetProducts(p));
     s && dispatch(selectProduct(s));
   }, []);
 
@@ -59,7 +62,14 @@ function App() {
 
   return (
     <div className="App">
-      {!("data" in products.response) ? (
+      {products.error ? (
+        <Error
+          error={products.error}
+          onRefetchClick={() => {
+            window.location.reload();
+          }}
+        />
+      ) : !("data" in products.response) ? (
         <Loading />
       ) : (
         <Box

@@ -35,6 +35,7 @@ type State = {
   response: ResponseType;
   page?: number;
   id?: number;
+  error?: unknown;
   selectedProductIndex?: number;
 };
 
@@ -55,20 +56,29 @@ export function isSingle(
 export const fetchGetProducts = createAsyncThunk(
   "products/getProducts",
   async (page: number = 1, thunkAPI) => {
-    setPage(page);
-    const response = await getProducts(page);
-    thunkAPI.dispatch(changePage(page));
-    return response;
+    try {
+      setPage(page);
+      const response = await getProducts(page);
+      thunkAPI.dispatch(changePage(page));
+      return response;
+    } catch (e) {
+      thunkAPI.dispatch(setError(JSON.stringify(e)));
+    }
   }
 );
 
 export const fetchGetProductById = createAsyncThunk(
   "products/getProductById",
   async (id: number, thunkAPI) => {
-    setId(id);
-    const response = await getProductById(id);
-    thunkAPI.dispatch(setFilterId(id));
-    return response;
+    try {
+      setId(id);
+      const response = await getProductById(id);
+      thunkAPI.dispatch(setFilterId(id));
+      return response;
+    } catch (e) {
+      console.error("WHOOOT", e);
+      thunkAPI.dispatch(setError(JSON.stringify(e)));
+    }
   }
 );
 
@@ -90,21 +100,37 @@ const productsSlice = createSlice({
       state.selectedProductIndex = undefined;
       unsetSelectedProduct();
     },
+    setError(state, action: PayloadAction<unknown>) {
+      state.error = action.payload;
+    },
+    clearError(state) {
+      state.error = undefined;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchGetProducts.fulfilled, (state, action) => {
+        if (!action.payload) return;
+
         state.response = action.payload;
         state.id = undefined;
       })
       .addCase(fetchGetProductById.fulfilled, (state, action) => {
+        if (!action.payload) return;
+
         state.response = action.payload;
         state.id = action.payload.data.id;
       });
   },
 });
 
-export const { changePage, selectProduct, unselectProduct, setFilterId } =
-  productsSlice.actions;
+export const {
+  changePage,
+  selectProduct,
+  unselectProduct,
+  setFilterId,
+  setError,
+  clearError,
+} = productsSlice.actions;
 
 export default productsSlice.reducer;

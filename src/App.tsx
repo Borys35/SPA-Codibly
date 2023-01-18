@@ -30,7 +30,7 @@ function App() {
     id !== undefined
       ? dispatch(fetchGetProductById(id))
       : dispatch(fetchGetProducts(p));
-    s && dispatch(selectProduct(s));
+    s !== undefined && dispatch(selectProduct(s));
   }, []);
 
   return (
